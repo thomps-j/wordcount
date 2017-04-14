@@ -22,7 +22,7 @@ unsigned int parseDictFile(t_wlist **wlist, const char *filename) {
       buff[chars - 1] = 0;
       chars -= 1;
     }
-   if (addWord(wlist, strdup(buff)) == EXIT_FAILURE)
+    if (addWord(wlist, strdup(buff)) == EXIT_FAILURE)
      return (0);
    total_words += 1;
  }
@@ -46,7 +46,7 @@ unsigned int		parseInputStream(t_wlist **table, const unsigned int size, const i
      until a delimiter (' ' or '\0') is reached, after what the newly
      found word is compared with the dict words list
    */
-    do {
+  do {
     chars = read(fd, &c, 1);
     printf("read >> '%c' (%zu)\n", c, chars);
     if (chars == 0 || c == '\0' || c == '\n' || c == ' ') {
@@ -78,6 +78,6 @@ unsigned int		parseInputStream(t_wlist **table, const unsigned int size, const i
       buff[len] = '\0';
     }
   }  while (chars > 0);
-free(buff);
-return (total_words);
+  free(buff);
+  return (total_words);
 }

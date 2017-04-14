@@ -5,10 +5,11 @@ unsigned long hashWord(const char *word) {
 	as it is short and very efficient for hash table use
 	*/
 	unsigned long hash = 5381;
-    int c;
+	int c;
 
-    while (c = (int) * word++)
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	while (c = (int) * word++) {
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */		
+	}
 	return (hash);
 }
 
@@ -47,7 +48,7 @@ t_wlist **createHashTable(t_wlist *list, const unsigned int size) {
 	if ((table = malloc(sizeof(t_wlist *) * (max_index))) == NULL)
 		return (NULL);
 	for (i = 0; i < max_index; i++)
-    	table[i] = NULL;
+		table[i] = NULL;
 	while (list != NULL) {
 		/* for every word, get a hash code from word that will be
 		used as index in the hash table

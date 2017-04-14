@@ -15,7 +15,7 @@ int		main(int argc, char **argv) {
   }
   if ((size = parseDictFile(&list, argv[1])) == 0)
     return (EXIT_FAILURE);
- 
+  
   /* create the hash table from the list of words
   */
   hashtable = createHashTable(list, size);

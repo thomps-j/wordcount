@@ -1,4 +1,4 @@
-#include  "wlist.h"
+#include	"wlist.h"
 
 void		displayWords(t_wlist *list, unsigned int total_words) {
   while (list != NULL) {
