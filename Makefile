@@ -7,6 +7,7 @@ INCDIR	=	-Iincludes
 SRC	=	$(SRCDIR)/main.c \
 		$(SRCDIR)/wlist.c \
 		$(SRCDIR)/parser.c \
+		$(SRCDIR)/hash.c \
 
 OBJ	=	$(SRC:.c=.o)
 

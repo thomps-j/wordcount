@@ -9,7 +9,7 @@
 typedef struct	s_wlist {
 	char		*word;
 	unsigned int	occurencies;
-	struct s_wordlist	*next;
+	struct s_wlist	*next;
 }				t_wlist;
 
 int				addWord(t_wlist **list, char *word);

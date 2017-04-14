@@ -1,14 +1,15 @@
 #include	"parser.h"
 
-t_wlist	*parseDictFile(const char *filename) {
-  t_wlist	*wlist = NULL;
+unsigned int parseDictFile(t_wlist **wlist, const char *filename) {
   FILE		*fp;
   char		*buff = NULL, *new_word;
   ssize_t	len = 0, chars;
+  unsigned int total_words = 0;
 
   if ((fp = fopen(filename, "r")) == NULL)
-    return (NULL);
+    return (0);
   
+  *wlist = NULL;
   while ((chars = getline(&buff, &len, fp)) != -1) {
     /* if the line starts with # or is empty, continue to the next one
      */
@@ -21,32 +22,41 @@ t_wlist	*parseDictFile(const char *filename) {
       buff[chars - 1] = 0;
       chars -= 1;
     }
-    if (findWord(wlist, buff) == NULL) {
-      /* this is the first occurence for this word,
-	 therefore it is added to the list
-      */
-      if ((new_word = malloc(sizeof(char) * (chars + 1))) == NULL)
-       return (NULL);
-     if (addWord(&wlist, strcpy(new_word, buff)) == EXIT_FAILURE)
-       return (NULL);
-   }
+    /* OBSOLETE CODE WITH HASHTABLE
+    createHashTable() already checks for redondency
+    */
+   //  if (findWord(*wlist, buff) == NULL) {
+   //    /* this is the first occurence for this word,
+   //    therefore it is added to the list
+   //    */
+   //    if ((new_word = malloc(sizeof(char) * (chars + 1))) == NULL)
+   //     return (0);
+   //   if (addWord(wlist, strcpy(new_word, buff)) == EXIT_FAILURE)
+   //     return (0);
+   //   total_words += 1;
+   // }
+   if ((new_word = malloc(sizeof(char) * (chars + 1))) == NULL)
+     return (0);
+   if (addWord(wlist, strcpy(new_word, buff)) == EXIT_FAILURE)
+     return (0);
+   total_words += 1;
  }
  free(buff);
  fclose(fp);
- return (wlist);
+ return (total_words);
 }
 
-int		parseInputStream(t_wlist **wlist, int fd) {
+unsigned int		parseInputStream(t_wlist **table, const unsigned int size, const int fd) {
   char		c;
   char		*buff;
   ssize_t	len = 0, chars;
-  unsigned int total_words = 0;
+  unsigned int total_words = 0, size_table;
   t_wlist	*temp;
 
   if ((buff = malloc(sizeof(char))) == NULL)
     return (-1);
   *buff = '\0';
-  
+  size_table = size * HASH_SIZE_FACTOR;
   /* the file is read char after char, which are appended to a buffer
      until a delimiter (' ' or '\0') is reached, after what the newly
      found word is compared with the dict words list
@@ -55,12 +65,12 @@ int		parseInputStream(t_wlist **wlist, int fd) {
     chars = read(fd, &c, 1);
     len++;
     if (c == ' ' || chars == 0) {
-      /* if so, the word is complete and will be compared with the dict
+      /* if so, the word is complete and will be search through the hash table
        */
       total_words += 1;
-      if ((temp = findWord(*wlist, buff)) != NULL)
+      if ((temp = searchHashTable(table, size_table, buff)) != NULL)
       {
-	  /* the word is part of the dict
+	  /* the word is part of the hash table
 	   */
        temp->occurencies += 1;
      }
