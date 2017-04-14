@@ -2,7 +2,7 @@
 
 unsigned int parseDictFile(t_wlist **wlist, const char *filename) {
   FILE		*fp;
-  char		*buff = NULL, *new_word;
+  char		*buff = NULL;
   ssize_t	len = 0, chars;
   unsigned int total_words = 0;
 
@@ -22,22 +22,7 @@ unsigned int parseDictFile(t_wlist **wlist, const char *filename) {
       buff[chars - 1] = 0;
       chars -= 1;
     }
-    /* OBSOLETE CODE WITH HASHTABLE
-    createHashTable() already checks for redondency
-    */
-   //  if (findWord(*wlist, buff) == NULL) {
-   //    /* this is the first occurence for this word,
-   //    therefore it is added to the list
-   //    */
-   //    if ((new_word = malloc(sizeof(char) * (chars + 1))) == NULL)
-   //     return (0);
-   //   if (addWord(wlist, strcpy(new_word, buff)) == EXIT_FAILURE)
-   //     return (0);
-   //   total_words += 1;
-   // }
-   if ((new_word = malloc(sizeof(char) * (chars + 1))) == NULL)
-     return (0);
-   if (addWord(wlist, strcpy(new_word, buff)) == EXIT_FAILURE)
+   if (addWord(wlist, strdup(buff)) == EXIT_FAILURE)
      return (0);
    total_words += 1;
  }
@@ -61,35 +46,38 @@ unsigned int		parseInputStream(t_wlist **table, const unsigned int size, const i
      until a delimiter (' ' or '\0') is reached, after what the newly
      found word is compared with the dict words list
    */
-  do {
+    do {
     chars = read(fd, &c, 1);
-    len++;
-    if (c == ' ' || chars == 0) {
-      /* if so, the word is complete and will be search through the hash table
-       */
-      total_words += 1;
-      if ((temp = searchHashTable(table, size_table, buff)) != NULL)
-      {
-	  /* the word is part of the hash table
-	   */
-       temp->occurencies += 1;
-     }
-
-      /* len and buff are reset for the next word iteration
-       */
-     len = 0;
-     *buff = '\0';
-   }
-   else {
-      /* otherwise the new char is added to the buffer
-	       after a realloc
+    printf("read >> '%c' (%zu)\n", c, chars);
+    if (chars == 0 || c == '\0' || c == '\n' || c == ' ') {
+      /* the character is a separator
       */
-    if ((buff = realloc(buff, sizeof(char) * (len + 1))) == NULL)
-     return (-1);
-   buff[len - 1] = c;
-   buff[len] = '\0';      
- }
-} while (chars > 0);
+      if (len > 0) {
+        /* the buffer is not empty, which means there is a word in it
+        */
+        if ((temp = searchHashTable(table, size_table, buff)) != NULL)
+        {
+        /* the word is part of the hash table
+        */
+          temp->occurencies += 1;
+        }
+        /* len and buff are reset for the next word iteration
+        */
+        len = 0;
+        *buff = '\0';
+        total_words++;
+      }
+    } else {
+      /* otherwise the new char is added to the buffer
+      after a realloc
+      */
+      len++;
+      if ((buff = realloc(buff, sizeof(char) * (len + 1))) == NULL)
+        return (-1);
+      buff[len - 1] = c;
+      buff[len] = '\0';
+    }
+  }  while (chars > 0);
 free(buff);
 return (total_words);
 }
