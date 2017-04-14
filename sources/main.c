@@ -35,5 +35,6 @@ int		main(int argc, char **argv) {
   }
   displayWords(list, total_words); // display the words occurcencies
   clearWordList(list); // words list is freed before exit
+  free(hashtable);
   return (EXIT_SUCCESS);
 }
